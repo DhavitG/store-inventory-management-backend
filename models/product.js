@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const productSchema = new mongoose.Schema({
+const ProductSchema = new mongoose.Schema({
   name: { type: String, required: [true, "product must have a name"] },
   price: { type: Number, required: [true, "product must have a price"] },
   featured: { type: Boolean, default: false },
@@ -16,6 +16,6 @@ const productSchema = new mongoose.Schema({
   //enum: ["ikea", "liddy", "caressa", "marcos"] }, // enum: only particular values allowed
 });
 
-const productModel = mongoose.model("Product", productSchema);
+const productModel = mongoose.model("Product", ProductSchema);
 
-mongoose.exports = productModel;
+module.exports = productModel;
