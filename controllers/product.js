@@ -1,15 +1,16 @@
 const Product = require("../models/product");
 
 const getAllProductsStatic = async (req, res) => {
-  const search = "ab"; // everything with an ab
-  const products = await Product.find({
-    name: { $regex: search, $options: "i" },
-  });
+  const products = await Product.find({})
+    .sort("name") // space and next property
+    .select("name price") // space and next property
+    .limit(4)
+    .skip(15); // will skip the first 15
   res.status(200).json({ products });
 };
 
 const getAllProducts = async (req, res) => {
-  const { featured, company, name } = req.query;
+  const { featured, company, name, sort, fields } = req.query;
   const queryObject = {};
 
   if (featured) {
@@ -22,10 +23,36 @@ const getAllProducts = async (req, res) => {
   }
 
   if (name) {
-    queryObject.name = { $regex: name, $options: "i" };
+    queryObject.name = { $regex: name, $options: "i" }; // regex: substring-search, i: case-insensitive
   }
 
-  const products = await Product.find(queryObject);
+  let result = Product.find(queryObject);
+
+  console.log("Query Object:", queryObject);
+
+  if (sort) {
+    const sortList = sort
+      .split(",")
+      .map((e) => e.trim())
+      .filter((e) => e !== "")
+      .join(" ");
+    result = result.sort(sortList);
+
+    console.log(sortList);
+  } else {
+    result = result.sort("createdAt");
+  }
+
+  if (fields) {
+    const fieldsList = fields
+      .split(",")
+      .map((e) => e.trim())
+      .filter((e) => e !== "")
+      .join(" ");
+    result = result.select(fieldsList);
+  }
+
+  const products = await result;
   res.status(200).json({ products });
 };
 
